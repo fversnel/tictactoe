@@ -6,10 +6,10 @@
             [org.fversnel.tictactoe.util.logging :as l :refer [log logln]]))
 
 (defn play-game
-  [{:keys [players starting-player finish-chan logger]
-    :or {starting-player :x
-         finish-chan (chan 1)
-         logger l/no-op-logger}}]
+  [& {:keys [players starting-player finish-chan logger]
+      :or {starting-player :x
+           finish-chan (chan 1)
+           logger l/system-out-logger}}]
 
   (go-loop [game-state (initial-game-state {:starting-player starting-player})]
     (logln logger)
@@ -27,15 +27,12 @@
               (>! finish-chan {:error :invalid-move}))))
 
         ; else
-        (let [game-state (assoc
-                          game-state
-                          :winner (winner game-state))]
-          (>! finish-chan game-state))))))
+        (>! finish-chan game-state)))))
 
 (defn play-games
-  [{:keys [players number-of-games logger]
-    :or {number-of-games 1
-         logger l/no-op-logger}}]
+  [& {:keys [players number-of-games logger]
+      :or {number-of-games (do (println "games") 1)
+           logger l/system-out-logger}}]
 
   (let [finish-chan (chan 1)]
     (go-loop [state {:starting-player :x
@@ -48,11 +45,12 @@
 
           (do
             (play-game
-             {:players players
-              :starting-player (:starting-player state)
-              :finish-chan finish-chan
-              :logger logger})
+             :players players
+             :starting-player (:starting-player state)
+             :finish-chan finish-chan
+             :logger logger)
             (let [{:keys [winner] :as game-result} (<! finish-chan)]
+              (logln logger "winner" winner)
               (recur
                {:starting-player (swap-player starting-player)
                 :finished-games (inc finished-games)
@@ -62,9 +60,25 @@
           (logln logger wins))))))
 
 (comment
-  (play-game 
-    {:players {:x stupid-but-legal-ai
-               :o brute-force-ai}
-     :logger system-out-logger})
+
+
+  (use :reload 'org.fversnel.tictactoe.ai.brute)
+  (use :reload 'org.fversnel.tictactoe.ai.stupid)
+  (use :reload 'org.fversnel.tictactoe.ai.treewalking)
+  (use :reload 'org.fversnel.tictactoe.game)
+
+  (play-games :players {:x brute-force-ai :o stupid-but-legal-ai} :)
   
+  (defn configure [& {:keys [debug verbose]
+                      :or {debug false, verbose false}}]
+    (println " debug =" debug " verbose =" verbose))
+
+
+    (defn play-game2
+      [& {:keys [players starting-player finish-chan logger]}
+          ; :or {starting-player :x
+          ;      finish-chan (do (println "aap chan") (chan 1))
+          ;      logger l/system-out-logger}}
+               ]
+        players)
   )
