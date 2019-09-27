@@ -4,19 +4,16 @@
 ;(def print-board b/print-board)
 
 (defn initial-game-state
-  ([]
-   (initial-game-state {}))
-
-  ([{:keys [starting-player board-size]
-     :or {starting-player :x
-          board-size 3}}]
+  [& {:keys [starting-player board-size]
+       :or {starting-player :x
+            board-size 3}}]
    (let [initial-board (b/empty-board board-size)]
     {:initial-board initial-board
      :starting-player starting-player
      :board initial-board
      :board-size board-size
      :moves []
-     :active-player starting-player})))
+     :active-player starting-player}))
     
 (defn empty-spot? [spot] (= spot :_))
 

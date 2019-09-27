@@ -83,8 +83,8 @@
   "TODO"
   []
   (let [α ##-Inf
-        β ##Inf])
-  )
+        β ##Inf]
+    β))
 
 (defn best-move [{:keys [active-player moves] :as game-state}]
   (let [verdict (minimax 
@@ -102,6 +102,7 @@
     (reduce
       core/apply-move
       (core/initial-game-state)
+      ; Best next move should be {:x 2 :y 0}
       [{:x 0 :y 0} {:x 1 :y 1} {:x 1 :y 0} {:x 2 :y 2}]))
   
   

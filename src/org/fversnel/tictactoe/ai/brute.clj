@@ -8,5 +8,5 @@
     (player-name [_] "BruteForceAI")
 
     (play
-			[_ game-state play-move]
-			(play-move (t/best-move game-state)))))
+      [_ game-state play-move]
+      (play-move (t/best-move game-state)))))
