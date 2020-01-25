@@ -10,9 +10,8 @@
     game-state))
 
 (defn game-verdict
-  [us {:keys [moves winner] :as game-state}]
-  (let [depth (count moves)
-        opponent (core/swap-player us)
+  [us depth {:keys [moves winner] :as game-state}]
+  (let [opponent (core/swap-player us)
         score (condp = winner
                 us (- 100 depth) 
                 opponent (- depth 100)
@@ -21,7 +20,8 @@
     {:moves moves :score score}))
 
 (defn minimax 
-  "game-state->verdict is function that takes a node (a game state) and produces a map {:score number}
+  "game-state->verdict is function that takes the current depth in the tree and a node (a game state) and produces a map 
+   with at least {:score number}. You're free to add more information to that map as you see fit.
   
    game-state-zipper is a zipper around the game-state such the minimax knows how to walk the game tree
    
@@ -70,7 +70,7 @@
 
           ; Determine if you want to calculate a verdict at this position
           (and (not verdict) leaf?)
-            (let [verdict (game-state->verdict current-node)]
+            (let [verdict (game-state->verdict depth current-node)]
               (recur (assoc-verdict tree verdict)))
 
           (not verdict)
@@ -96,6 +96,7 @@
     move))
 
 (comment
+  (require :reload '[org.fversnel.tictactoe.core :as core])
   (use :reload 'org.fversnel.tictactoe.ai.treewalking)
 
   (def example-game 

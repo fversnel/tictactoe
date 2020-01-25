@@ -10,13 +10,13 @@
 
 (def player-tokens [:x :o])
 
-(def tokens (concat player-tokens [empty-token]))
+(def tokens (conj player-tokens empty-token))
 
-(defn create-board [on-spot board-size]
+(defn create-board [fill-spot board-size]
   (mapv
     (fn [y] 
       (mapv 
-        (fn [x] (on-spot {:x x :y y})) 
+        (fn [x] (fill-spot {:x x :y y})) 
         (range board-size)))
     (range board-size)))
 
@@ -27,7 +27,7 @@
   (partial create-board (fn [_] (rand-nth tokens))))
 
 (def random-full-board
-    (partial create-board (fn [_] (rand-nth player-tokens))))
+  (partial create-board (fn [_] (rand-nth player-tokens))))
 
 ;
 ; Lookup and manipulation
