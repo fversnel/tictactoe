@@ -83,7 +83,7 @@
 ;
 
 (defn- token-line? 
-  "Determines if a line on the board solely consists of one token type (e.g. :x)"
+  "Determines if the given line on the board solely consists of one token type (e.g. :x)"
   [board token line-coords]
   (t/every?
    (map (partial spot board))

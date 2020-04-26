@@ -10,7 +10,6 @@
       :or {starting-player :x
            finish-chan (chan 1)
            logger l/system-out-logger}}]
-
   (go-loop [game-state (initial-game-state {:starting-player starting-player})]
     (logln logger)
     (let [{:keys [board active-player]} game-state]

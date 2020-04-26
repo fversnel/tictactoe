@@ -5,28 +5,32 @@
 
 (defn initial-game-state
   [& {:keys [starting-player board-size]
-       :or {starting-player :x
-            board-size 3}}]
-   (let [initial-board (b/empty-board board-size)]
+      :or {starting-player :x
+           board-size 3}}]
+  (let [initial-board (b/empty-board board-size)]
     {:initial-board initial-board
      :starting-player starting-player
      :board initial-board
-     :board-size board-size
-     :moves []
-     :active-player starting-player}))
-    
-(defn empty-spot? [spot] (= spot :_))
+     :moves []}))
 
-(defn swap-player [player]
-  (case player
-    :x :o
-    :o :x))
+(def empty-spot?
+  (partial = :_))
+
+(def swap-player
+  {:x :o
+   :o :x})
+
+(defn active-player
+  [{:keys [starting-player moves]}]
+  (if (even? (count moves))
+    starting-player
+    (swap-player starting-player)))
 
 (defn valid-move?
   [{:keys [board]} move]
   (empty-spot? (b/spot board move)))
 
-(defn- player-wins? 
+(defn- player-wins?
   [player board]
   (when (b/filled-line? board player) player))
 
@@ -35,34 +39,34 @@
   (when (b/full-board? board) :tie))
 
 (defn winner
-  [board]
+  [{:keys [board]}]
   (or
-    (player-wins? :o board)
-    (player-wins? :x board)
-    (tie? board)))
+   (player-wins? :o board)
+   (player-wins? :x board)
+   (tie? board)))
 
-(defn finished? [{:keys [winner]}]
-  (not (nil? winner)))
+(defn finished?
+  [game-state]
+  (some? (winner game-state)))
 
 (defn possible-moves
-  [{:keys [board] :as game-state}]
+  [{:keys [board]}]
   (for [coord (b/coords board)
         :when (empty-spot? (b/spot board coord))]
     coord))
 
 (defn apply-move
-  [{:keys [board moves active-player] :as game-state}
+  [{:keys [board moves] :as game-state}
    move]
-  (let [new-board (b/fill-spot board move active-player)]
+  (let [active-player (active-player game-state)
+        new-board (b/fill-spot board move active-player)]
     (assoc
-      game-state
-      :board new-board
-      :moves (conj moves move)
-      :active-player (swap-player active-player)
-      ; TODO Only assoc a winner if we have one
-      :winner (winner new-board))))
+     game-state
+     :board new-board
+     :moves (conj moves move))))
 
-(defn possible-states [game-state]
+(defn possible-states
+  [game-state]
   (for [move (possible-moves game-state)]
     (apply-move game-state move)))
 
